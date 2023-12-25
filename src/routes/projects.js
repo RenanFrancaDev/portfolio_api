@@ -34,11 +34,15 @@ router.post("/", connectDatabase, async (req, res, next) => {
   }
 });
 
-router.put("/:id", connectDatabase, async () => {
+router.put("/:id", connectDatabase, async (req, res, next) => {
   try {
-    let idProject = await SchemaProjects.findOne({ _id: idProject });
-    if (!idProject) {
-      throw new Error("`Project not found");
+    let idProject = req.params.id;
+    let { type, title, description, teachs, imageUrl, deploy, repository } =
+      req.body;
+
+    const checkProject = await SchemaProjects.findOne({ _id: idProject });
+    if (!checkProject) {
+      throw new Error("Project not found");
     }
     let updateProject = await SchemaProjects.updateOne(
       { _id: idProject },
@@ -46,13 +50,14 @@ router.put("/:id", connectDatabase, async () => {
     );
     if (updateProject?.modifiedCount > 0) {
       const resDB = await SchemaProjects.findOne({ _id: idProject });
+
+      res.status(200).json({
+        status: "OK",
+        statusMensagem: "Project sucefully update",
+        response: resDB,
+      });
     }
-    res.status(200).json({
-      status: "OK",
-      statusMensagem: "Project sucefully update",
-      resposta: resDB,
-    });
-  } catch {
+  } catch (error) {
     res.status(500).json("internal server error");
   }
 });
