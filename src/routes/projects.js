@@ -34,17 +34,40 @@ router.post("/", connectDatabase, async (req, res, next) => {
   }
 });
 
+router.put("/:id", connectDatabase, async () => {
+  try {
+    let idProject = await SchemaProjects.findOne({ _id: idProject });
+    if (!idProject) {
+      throw new Error("`Project not found");
+    }
+    let updateProject = await SchemaProjects.updateOne(
+      { _id: idProject },
+      { type, title, description, teachs, imageUrl, deploy, repository }
+    );
+    if (updateProject?.modifiedCount > 0) {
+      const resDB = await SchemaProjects.findOne({ _id: idProject });
+    }
+    res.status(200).json({
+      status: "OK",
+      statusMensagem: "Project sucefully update",
+      resposta: resDB,
+    });
+  } catch {
+    res.status(500).json("internal server error");
+  }
+});
+
 router.delete("/:id", connectDatabase, async (req, res, next) => {
   try {
     let idProject = req.params.id;
     const checkProject = await SchemaProjects.findOne({ _id: idProject });
     if (!checkProject) {
-      throw new Error("Book not found.");
+      throw new Error("Project not found.");
     }
     const resDB = await SchemaProjects.deleteOne({ _id: idProject });
     res.status(200).json({
       status: "OK",
-      statusMensagem: "Poject sucefully deleted",
+      statusMensagem: "Project sucefully deleted",
       response: resDB,
     });
   } catch (error) {
