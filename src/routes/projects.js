@@ -34,4 +34,22 @@ router.post("/", connectDatabase, async (req, res, next) => {
   }
 });
 
+router.delete("/:id", connectDatabase, async (req, res, next) => {
+  try {
+    let idProject = req.params.id;
+    const checkProject = await SchemaProjects.findOne({ _id: idProject });
+    if (!checkProject) {
+      throw new Error("Book not found.");
+    }
+    const resDB = await SchemaProjects.deleteOne({ _id: idProject });
+    res.status(200).json({
+      status: "OK",
+      statusMensagem: "Poject sucefully deleted",
+      response: resDB,
+    });
+  } catch (error) {
+    res.status(500).json("internal server error");
+  }
+});
+
 module.exports = router;
